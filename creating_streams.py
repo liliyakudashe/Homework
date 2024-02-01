@@ -14,8 +14,8 @@ def letters():
         time.sleep(1)
 
 
-t1 = threading.Thread(target=numbers())
-t2 = threading.Thread(target=letters())
+t1 = threading.Thread(target=numbers)
+t2 = threading.Thread(target=letters)
 
 t1.start()
 t2.start()
