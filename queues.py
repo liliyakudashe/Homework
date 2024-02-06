@@ -15,42 +15,37 @@ class Cafe:
         self.tables = tables
 
     def customer_arrival(self):
+        customers = []
         for i in range(1, 21):
-            print(f"Посетитель номер {i} прибыл")
-            customer = threading.Thread(target=self.serve_customer, args=(i,))
-            customer.start()
             time.sleep(1)
+            print(f"Посетитель номер {i} прибыл")
+            customer = Customer(self, i)
+            customers.append(customer)
+            customer.start()
+        for cust in customers:
+            cust.join()
 
-    def serve_customer(self, customer_number):
+    def serve_customer(self, customer):
         for table in self.tables:
             if not table.is_busy:
                 table.is_busy = True
-                print(f"Посетитель номер {customer_number} сел за стол {table.number}")
-                time.sleep(5)
-                print(f"Посетитель номер {customer_number} покушал и ушёл.")
+                print(f"Посетитель номер {customer.number} сел за стол {table.number}")
+                time.sleep(2)
+                print(f"Посетитель номер {customer.number} покушал и ушёл.")
                 table.is_busy = False
-                break
-        print(f"Посетитель номер {customer_number} ожидает свободный стол.")
-        self.queue.put(customer_number)
+                return
+        print(f"Посетитель номер {customer.number} ожидает свободный стол.")
+        self.queue.put(customer)
 
 
 class Customer(threading.Thread):
-    def __init__(self, cafe):
+    def __init__(self, cafe, number):
         super().__init__()
         self.cafe = cafe
+        self.number = number
 
     def run(self):
-        while True:
-            if not self.cafe.queue.empty():
-                customer_number = self.cafe.queue.get()
-                for table in self.cafe.tables:
-                    if not table.is_busy:
-                        table.is_busy = True
-                        print(f"Посетитель номер {customer_number} сел за стол {table.number}")
-                        time.sleep(5)
-                        print(f"Посетитель номер {customer_number} покушал и ушёл.")
-                        table.is_busy = False
-                        break
+        self.cafe.serve_customer(self)
 
 
 table1 = Table(1)
