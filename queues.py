@@ -7,6 +7,7 @@ class Table:
     def __init__(self, number):
         self.number = number
         self.is_busy = False
+        self.lock = threading.Lock()
 
 
 class Cafe:
@@ -18,7 +19,7 @@ class Cafe:
         customers = []
         for i in range(1, 21):
             time.sleep(1)
-            print(f"Посетитель номер {i} прибыл")
+            print(f"Посетитель номер {i} прибыл", flush=True)
             customer = Customer(self, i)
             customers.append(customer)
             customer.start()
@@ -27,14 +28,18 @@ class Cafe:
 
     def serve_customer(self, customer):
         for table in self.tables:
-            if not table.is_busy:
-                table.is_busy = True
-                print(f"Посетитель номер {customer.number} сел за стол {table.number}")
-                time.sleep(2)
-                print(f"Посетитель номер {customer.number} покушал и ушёл.")
-                table.is_busy = False
-                return
-        print(f"Посетитель номер {customer.number} ожидает свободный стол.")
+            with table.lock:
+                if not table.is_busy:
+                    print(f"Посетитель номер {customer.number} сел за стол {table.number}", flush=True)
+                    table.is_busy = True
+                    time.sleep(5)
+                    table.is_busy = False
+                    print(f"Посетитель номер {customer.number} покушал и ушёл", flush=True)
+                    if not self.queue.empty():
+                        next_customer = self.queue.get()
+                        self.serve_customer(next_customer)
+                    return
+        print(f"Посетитель номер {customer.number} ожидает свободный стол", flush=True)
         self.queue.put(customer)
 
 
