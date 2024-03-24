@@ -15,5 +15,4 @@ def employees_rewrite(sort_type):
         json.dump({'employees': sorted_data}, file, indent=2)
 
 
-
 employees_rewrite('lastName')
