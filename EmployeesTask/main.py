@@ -1,6 +1,5 @@
 import json
 
-
 def employees_rewrite(sort_type):
     valid_keys = {'firstName', 'lastName', 'department', 'salary'}
     if sort_type not in valid_keys:
