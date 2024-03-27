@@ -22,6 +22,8 @@ def main():
     # Plot the data
     dplt.create_and_save_plot(stock_data, ticker, period)
 
+    dd.notify_if_strong_fluctuations(stock_data, 4)
+
 
 if __name__ == "__main__":
     main()
